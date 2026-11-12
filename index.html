@@ -398,7 +398,6 @@ const store = {
   get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 };
-let visited = new Set(store.get("rzym-visited",[]));
 let todo = new Set(store.get("rzym-todo",[]));
 const PILL = {book:["KUP BILET",""],free:["za darmo",""],fixed:["stała godzina","fixed"]};
 const maps = ll => `https://www.google.com/maps/dir/?api=1&destination=${ll[0]},${ll[1]}&travelmode=walking`;
@@ -415,24 +414,22 @@ function renderTabs(active){
 function renderDay(d){
   const di = DAYS.indexOf(d);
   const places = d.items.filter(i=>i.p);
-  const done = places.filter(i=>visited.has(i.p)).length;
   let nowI=-1;
   if(todayIdx()===di){const m=nowMin();d.items.forEach((it,i)=>{if(toMin(it.t)<=m) nowI=i});}
   const route = places.map(i=>PLACES[i.p].ll.join(","));
   const routeUrl = `https://www.google.com/maps/dir/?api=1&origin=${route[0]}&destination=${route[route.length-1]}&waypoints=${route.slice(1,-1).join("|")}&travelmode=walking`;
   $("#app").innerHTML = `
-   <div class="brand"><h1>ROMA · 3 DNI</h1><span>${done}/${places.length} zaliczone</span></div>
+   <div class="brand"><h1>ROMA · 3 DNI</h1><span>${d.name.toLowerCase()}</span></div>
    <header class="dayhead"><div class="numeral">${d.num}</div><div class="it">${d.name} · ${d.it}</div><h2>${d.theme}</h2></header>
    <p class="dayline">${d.line}</p>
-   <div class="progress"><i style="width:${places.length?done/places.length*100:0}%"></i></div>
    <div class="daymeta"><span class="chip">${d.km}</span><span class="chip">${places.length} miejsc</span>
      <a class="btn" href="${routeUrl}" target="_blank" rel="noopener">Trasa dnia w Mapach ↗</a></div>
    <ol class="tl">${d.items.map((it,i)=>{
      const now = i===nowI ? `<span class="pill now">teraz</span>`:"";
      if(it.note) return `<li><div class="note"><span class="time">${it.t}</span><div class="body">${now?now+" ":""}<b>${it.note}.</b> ${it.text}</div></div></li>`;
-     const p = PLACES[it.p], v = visited.has(it.p);
-     const pills = (it.tags||[]).map(t=>`<span class="pill ${PILL[t][1]}">${PILL[t][0]}</span>`).join("") + (v?`<span class="pill done">✓ zaliczone</span>`:"") + now;
-     return `<li class="${v?"visited":""}"><button class="stop" data-place="${it.p}">
+     const p = PLACES[it.p];
+     const pills = (it.tags||[]).map(t=>`<span class="pill ${PILL[t][1]}">${PILL[t][0]}</span>`).join("") + now;
+     return `<li><button class="stop" data-place="${it.p}">
        <span class="time">${it.t}</span><img class="thumb" src="img/${p.img}.jpg" alt="" loading="lazy">
        <span class="txt"><h3>${p.name}</h3><p>${p.lead}</p><span class="pills"><span class="pill" style="background:none;padding-left:0;color:var(--muted)">${p.dur}</span>${pills}</span></span></button></li>`;
    }).join("")}</ol>`;
@@ -476,20 +473,17 @@ function openPlace(id){
   const p = PLACES[id]; if(!p) return;
   const day = DAYS.find(d=>d.items.some(i=>i.p===id));
   const it = day.items.find(i=>i.p===id);
-  const v = visited.has(id);
   const s = $("#sheet");
   s.innerHTML = `<div class="hero"><img src="img/${p.img}.jpg" alt="${p.name}"><button class="close" id="close" aria-label="Zamknij">←</button><span class="credit">fot. Wikimedia Commons</span></div>
    <div class="sbody"><div class="eyebrow">${day.num} · ${day.name.toUpperCase()} · ${it.t} · ${p.dur}</div>
    <h2>${p.name}</h2><p class="orig">${p.orig}</p><p class="lead">${p.lead}</p>
-   <div class="actions"><a class="btn solid" href="${maps(p.ll)}" target="_blank" rel="noopener">Nawiguj ↗</a>
-     <button class="btn" id="mark" aria-pressed="${v}">${v?"✓ Zaliczone":"Oznacz jako zaliczone"}</button></div>
+   <div class="actions"><a class="btn solid" href="${maps(p.ll)}" target="_blank" rel="noopener">Nawiguj ↗</a></div>
    <h4>HISTORIA</h4>${p.hist.map(x=>`<p>${x}</p>`).join("")}
    <h4>CIEKAWOSTKI</h4><ul class="facts">${p.facts.map(x=>`<li>${x}</li>`).join("")}</ul>
    <h4>PRAKTYCZNIE</h4><dl class="kv">${p.info.map(([k,x])=>`<dt>${k}</dt><dd>${x}</dd>`).join("")}</dl>
    ${p.tip?`<div class="tip"><b>Wskazówka:</b> ${p.tip}</div>`:""}</div>`;
   s.hidden = false; s.scrollTop = 0; document.body.style.overflow="hidden";
   $("#close").onclick = ()=>{ location.hash = day.id };
-  $("#mark").onclick = ()=>{ visited.has(id)?visited.delete(id):visited.add(id); store.set("rzym-visited",[...visited]); openPlace(id); renderDay(day); };
 }
 function closeSheet(){ $("#sheet").hidden = true; document.body.style.overflow=""; }
 
