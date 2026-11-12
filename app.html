@@ -1,0 +1,509 @@
+<title>Roma w 3 dni</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: phone-first timeline app, one column (max 640px), fixed bottom tab bar, full-screen place sheet */
+:root{
+  --bg:#F2F0EB; --surface:#FFFFFF; --ink:#1E2321; --muted:#5F6862; --line:#DCD8CF;
+  --accent:#2C6B5E;       /* verderame: patyna brązu rzymskich nasoni */
+  --accent-soft:#DDEAE5;
+  --ochre:#B97A1C;        /* giallo romano: kolor rzymskich fasad */
+  --ochre-soft:#F4E6CC;
+  --f-display:"Cinzel","Trajan Pro",Georgia,serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --tabbar:64px;
+}
+:root{color-scheme:light}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+.app{max-width:640px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:20px calc(var(--tabbar) + 32px + env(safe-area-inset-bottom,0px))}
+
+/* top brand */
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:15px;letter-spacing:.22em;margin:0;color:var(--muted)}
+.brand span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+
+/* day header */
+.dayhead{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:end;margin:18px 0 6px}
+.numeral{font-family:var(--f-display);font-weight:700;font-size:64px;line-height:.85;color:var(--ochre);grid-row:span 2}
+.dayhead h2{margin:0;font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.1;text-wrap:balance}
+.dayhead .it{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.dayline{color:var(--muted);margin:10px 0 0;font-size:15px}
+.daymeta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px;align-items:center}
+.chip{font-size:13px;padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:14px;padding:9px 14px;border-radius:10px;border:1px solid var(--accent);color:var(--accent);background:transparent;text-decoration:none;cursor:pointer}
+.btn.solid{background:var(--accent);color:var(--bg)}
+.progress{height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin:12px 0 4px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+/* timeline */
+.tl{list-style:none;margin:18px 0 0;padding:0;position:relative}
+.tl::before{content:"";position:absolute;left:23px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.tl li{position:relative}
+.stop{display:grid;grid-template-columns:48px 72px 1fr;gap:12px;align-items:start;width:100%;text-align:left;background:none;border:0;padding:12px 0;cursor:pointer}
+.time{font-family:var(--f-mono);font-size:13px;color:var(--muted);background:var(--bg);padding:2px 0 6px;position:relative;z-index:1;font-variant-numeric:tabular-nums}
+.thumb{width:72px;height:72px;border-radius:12px;object-fit:cover;background:var(--line);display:block}
+.stop .txt{min-width:0}
+.stop h3{margin:0;font-size:17px;font-weight:700;line-height:1.25}
+.stop p{margin:3px 0 6px;font-size:14px;color:var(--muted);line-height:1.4}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:var(--accent-soft);color:var(--accent)}
+.pill.fixed{background:var(--ochre-soft);color:var(--ochre)}
+.pill.now{background:var(--ochre);color:var(--bg)}
+.pill.done{background:var(--accent);color:var(--bg)}
+li.visited .thumb{opacity:.45;filter:grayscale(.6)}
+li.visited h3{color:var(--muted)}
+.note{display:grid;grid-template-columns:48px 1fr;gap:12px;padding:8px 0}
+.note .body{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;font-size:14px;color:var(--muted);min-width:0}
+.note b{color:var(--ink);font-weight:600}
+
+/* info */
+.sec{margin-top:28px}
+.sec h3{font-family:var(--f-display);font-size:18px;margin:0 0 10px;letter-spacing:.04em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.todo{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.todo label{display:grid;grid-template-columns:24px 1fr;gap:10px;padding:8px 0;cursor:pointer;align-items:start}
+.todo input{width:20px;height:20px;accent-color:var(--accent);margin:2px 0 0}
+.todo small{display:block;color:var(--muted);font-size:13px}
+.todo input:checked + span{text-decoration:line-through;color:var(--muted)}
+.kv{display:grid;grid-template-columns:minmax(90px,auto) 1fr;gap:8px 14px;font-size:14px;margin:0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;min-width:0}
+.tips{margin:0;padding-left:18px;display:grid;gap:8px;font-size:15px}
+.phr{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:14px}
+.phr i{color:var(--muted);font-style:normal}
+
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+.tabbar nav{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--tabbar)}
+.tab{background:none;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;color:var(--muted)}
+.tab b{font-family:var(--f-display);font-size:17px;line-height:1}
+.tab span{font-size:12px}
+.tab[aria-current="true"]{color:var(--accent)}
+.tab[aria-current="true"] b{color:var(--ochre)}
+
+/* place sheet */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.hero{position:relative;max-width:640px;margin:0 auto}
+.hero img{width:100%;max-width:100%;aspect-ratio:4/3;max-height:52vh;object-fit:cover;display:block}
+.close{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));width:42px;height:42px;border-radius:50%;border:0;
+  background:rgba(20,22,21,.62);color:#fff;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.credit{position:absolute;right:8px;bottom:6px;font-size:10px;color:#fff;opacity:.8;text-shadow:0 1px 2px #000}
+.sbody{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.sbody .eyebrow{font-family:var(--f-mono);font-size:12px;color:var(--ochre);letter-spacing:.04em}
+.sbody h2{font-family:var(--f-display);font-size:30px;line-height:1.1;margin:6px 0 4px;text-wrap:balance}
+.sbody .orig{color:var(--muted);font-size:14px;margin:0}
+.lead{font-size:17px;margin:14px 0 0}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 4px}
+.sbody h4{font-family:var(--f-display);font-size:16px;letter-spacing:.08em;margin:26px 0 8px;color:var(--accent)}
+.sbody p{margin:0 0 10px;max-width:65ch}
+.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.facts li{padding-left:22px;position:relative}
+.facts li::before{content:"✦";position:absolute;left:0;top:0;color:var(--ochre);font-size:13px}
+.tip{margin-top:18px;background:var(--ochre-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.tip b{color:var(--ochre)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app"></div>
+<div class="tabbar"><nav id="tabs" aria-label="Dni"></nav></div>
+<div class="sheet" id="sheet" hidden></div>
+
+<script>
+const PLACES = {
+vatican:{name:"Muzea Watykańskie",orig:"Musei Vaticani",img:"vatican",ll:[41.9065,12.4536],dur:"ok. 3 h (z Kaplicą Sykstyńską)",
+ lead:"Jedna z największych kolekcji sztuki na świecie: antyczne rzeźby, Stanze Rafaela, Galeria Map i na końcu trasy Kaplica Sykstyńska.",
+ hist:["Muzea założył papież Juliusz II w 1506 roku. Kilka tygodni wcześniej w winnicy na Eskwilinie wykopano grupę Laokoona, którą papież natychmiast kupił i wystawił na dziedzińcu Belwederu. To był zaczątek kolekcji.",
+  "Przez kolejne stulecia papieże dobudowywali galerie, aż powstało ok. 7 km korytarzy i kilkadziesiąt tysięcy dzieł. Najważniejsze przystanki: Dziedziniec Ośmioboczny (Laokoon, Apollo Belwederski), Torso Belwederskie, Galeria Map, cztery Stanze Rafaela ze Szkołą Ateńską i oczywiście Kaplica Sykstyńska."],
+ facts:["Galeria Map ma 120 m długości. Na 40 freskach Ignazio Danti w latach 1580–1585 namalował całe Włochy, region po regionie.",
+  "W „Szkole Ateńskiej” Rafael dał Platonowi twarz Leonarda da Vinci, a zamyślonemu Heraklitowi na schodach rysy Michała Anioła.",
+  "Michał Anioł podobno odmówił „uzupełnienia” Torsa Belwederskiego, twierdząc, że jest doskonały w tej formie.",
+  "Słynne spiralne schody (podwójna helisa) to dzieło Giuseppe Momo z 1932 roku. Wejście i zejście nigdy się na nich nie spotykają."],
+ info:[["Bilety","Tylko na oficjalnej stronie museivaticani.va, ok. 20 € + opłata za rezerwację. Biorąc najwcześniejszy slot, omijacie tłumy."],["Godziny","Pn–sb od 8:00. W niedziele zamknięte (poza ostatnią niedzielą miesiąca)."],["Strój","Zakryte ramiona i kolana, tak samo jak w Bazylice."]],
+ tip:"Idźcie od razu szybkim krokiem do Kaplicy Sykstyńskiej i oglądajcie resztę w drodze powrotnej, kiedy grupy przejdą dalej. Na sali nie wolno robić zdjęć."},
+sistine:{name:"Kaplica Sykstyńska",orig:"Cappella Sistina",img:"sistine",ll:[41.9029,12.4545],dur:"30–45 min",
+ lead:"Sklepienie i „Sąd Ostateczny” Michała Anioła. To tu kardynałowie wybierają papieża.",
+ hist:["Kaplicę zbudowano w latach 1473–1481 dla papieża Sykstusa IV, od którego wzięła nazwę. Jej proporcje (ok. 40,9 × 13,4 m) mają odpowiadać biblijnej Świątyni Salomona. Ściany boczne pokryli freskami Botticelli, Perugino i Ghirlandaio.",
+  "W latach 1508–1512 Michał Anioł, który uważał się za rzeźbiarza, nie malarza, namalował na zlecenie Juliusza II sklepienie z ponad 300 postaciami, w tym ze „Stworzeniem Adama”. Ćwierć wieku później, w latach 1536–1541, wrócił, by namalować na ścianie ołtarzowej „Sąd Ostateczny”."],
+ facts:["Michał Anioł nie malował na leżąco, jak w filmach. Stał na zaprojektowanym przez siebie rusztowaniu z głową odchyloną do tyłu i pisał o tym ironiczny wiersz o bólu karku.",
+  "Mistrz ceremonii Biagio da Cesena skrytykował nagość postaci. Michał Anioł namalował go w piekle jako Minosa z oślimi uszami i wężem gryzącym go w krocze.",
+  "Po soborze trydenckim Daniele da Volterra domalował postaciom przepaski i dorobił się przezwiska „Il Braghettone”, czyli „majtkarz”.",
+  "Renowację z lat 1980–1994 sfinansowała japońska telewizja Nippon TV w zamian za prawa do zdjęć."],
+ info:[["Wstęp","W ramach biletu do Muzeów Watykańskich."],["Zasady","Cisza, zakaz zdjęć i filmowania."]],
+ tip:"Usiądźcie na ławce pod ścianą i oglądajcie sklepienie od wejścia w stronę ołtarza, czyli w kolejności opowieści o stworzeniu świata."},
+stpeter:{name:"Bazylika św. Piotra",orig:"Basilica di San Pietro",img:"stpeter",ll:[41.9022,12.4539],dur:"1–1,5 h (+1 h kopuła)",
+ lead:"Serce Kościoła katolickiego, wzniesione nad grobem św. Piotra. Pietà, baldachim Berniniego i widok z kopuły na cały Rzym.",
+ hist:["W IV wieku cesarz Konstantyn zbudował tu bazylikę nad grobem apostoła Piotra, ukrzyżowanego w pobliskim cyrku Nerona. Po ponad tysiącu lat budowla groziła zawaleniem, więc w 1506 roku Juliusz II rozpoczął budowę nowej. Trwała 120 lat (do 1626 roku) i pracowali przy niej Bramante, Rafael, Michał Anioł, Maderno i Bernini.",
+  "Kopułę zaprojektował Michał Anioł, a ukończył ją po jego śmierci Giacomo della Porta w 1590 roku. Wraz z krzyżem ma 136 m wysokości. Plac z kolumnadą (284 kolumny) Bernini zaprojektował jako „ramiona Kościoła” obejmujące wiernych."],
+ facts:["„Pietà” to jedyne dzieło, które Michał Anioł podpisał. Miał 24 lata i podobno usłyszał, jak ktoś przypisuje rzeźbę innemu artyście. Swoje imię wyrył na szarfie Marii. Od ataku z młotkiem w 1972 roku rzeźba stoi za szybą.",
+  "Brązowy baldachim Berniniego ma prawie 29 m wysokości, tyle co 9-piętrowy budynek.",
+  "Prawa stopa brązowego posągu św. Piotra jest wytarta przez wieki pocałunków i dotyku pielgrzymów.",
+  "Stańcie na jednym z dwóch porfirowych krążków między obeliskiem a fontannami. Cztery rzędy kolumn kolumnady zleją się wtedy w jeden.",
+  "Mundury Gwardii Szwajcarskiej nie są projektu Michała Anioła, jak głosi legenda. Zaprojektował je w 1914 roku komendant Jules Repond."],
+ info:[["Wstęp","Bezpłatny, kolejka do kontroli bezpieczeństwa po prawej stronie placu."],["Kopuła","Ok. 10–17 €. Pieszo 551 stopni albo windą na taras, a potem 320 stopni."],["Strój","Zakryte ramiona i kolana, inaczej was nie wpuszczą."]],
+ tip:"W niedzielę w południe papież odmawia Anioł Pański z okna Pałacu Apostolskiego. Dlatego Watykan zaplanowaliśmy na sobotę."},
+castel:{name:"Zamek Świętego Anioła",orig:"Castel Sant'Angelo",img:"castel",ll:[41.9031,12.4663],dur:"45 min z zewnątrz / 1,5 h w środku",
+ lead:"Grobowiec cesarza, który stał się papieską twierdzą, więzieniem i sceną finału „Toski”.",
+ hist:["Cesarz Hadrian zbudował go w latach 123–139 jako mauzoleum dla siebie i swoich następców. Później włączono go w mury miejskie i zamieniono w fortecę, najważniejszą twierdzę papieży.",
+  "Nazwa pochodzi z 590 roku. W czasie zarazy papież Grzegorz Wielki zobaczył nad mauzoleum archanioła Michała chowającego miecz do pochwy, co oznaczało koniec epidemii. Dlatego na szczycie stoi posąg anioła."],
+ facts:["Passetto di Borgo to ufortyfikowany korytarz o długości ok. 800 m łączący Watykan z zamkiem. W 1527 roku, w czasie Sacco di Roma, uciekł nim papież Klemens VII, gdy szwajcarscy gwardziści ginęli, osłaniając jego ucieczkę.",
+  "W III akcie opery Pucciniego „Tosca” bohaterka rzuca się z murów zamku.",
+  "Most Świętego Anioła zdobi 10 aniołów z narzędziami Męki według projektu Berniniego. Dwa oryginały dłuta samego mistrza uznano za zbyt piękne, by stały na deszczu. Są w kościele Sant'Andrea delle Fratte."],
+ info:[["Bilet","Ok. 16 €, wstęp na taras z widokiem w cenie."],["Godziny","Zwykle 9:00–19:30."]],
+ tip:"Jeśli brakuje czasu, wystarczy przejść przez Most Świętego Anioła. Najlepsze zdjęcie zamku robi się z mostu Umberto I."},
+navona:{name:"Piazza Navona",orig:"Piazza Navona",img:"navona",ll:[41.8992,12.4731],dur:"30–45 min",
+ lead:"Barokowy plac w kształcie antycznego stadionu, z Fontanną Czterech Rzek Berniniego.",
+ hist:["Wydłużony kształt placu to nie przypadek. Dokładnie tu stał Stadion Domicjana z 86 roku n.e., na którym ok. 20 tys. widzów oglądało zawody atletyczne („agones”). Z „in agone” powstało z czasem „Navona”. Kamienice stoją na fundamentach dawnych trybun.",
+  "W XVII wieku papież Innocenty X z rodu Pamphilj, którego pałac stoi przy placu, zamienił go w barokową scenę. Bernini stworzył Fontannę Czterech Rzek (1651) z alegoriami Nilu, Gangesu, Dunaju i Rio de la Plata."],
+ facts:["Legenda mówi, że Nil zasłania twarz, żeby nie patrzeć na kościół Sant'Agnese rywala Berniniego, Borrominiego. To mit: fontanna powstała, zanim zaczęto budować fasadę. Nil ma zakrytą głowę, bo jego źródła były wtedy nieznane.",
+  "Od 1652 do 1866 roku w sierpniowe weekendy zatykano odpływy i zalewano plac. Rzymianie przejeżdżali karetami przez „jezioro Navona”.",
+  "2 minuty od placu jest kościół San Luigi dei Francesi z trzema obrazami Caravaggia o św. Mateuszu. Wstęp darmowy, 1 € wrzucony do automatu włącza oświetlenie."],
+ info:[["Wstęp","Bezpłatny."],["W pobliżu","San Luigi dei Francesi (Caravaggio), pozostałości stadionu pod placem (Stadio di Domiziano, płatne)."]],
+ tip:"Kawiarnie z widokiem na fontannę są bardzo drogie. Kawę lepiej wypić 3 minuty dalej, w Sant'Eustachio Il Caffè przy Pantheonie."},
+pantheon:{name:"Panteon",orig:"Pantheon",img:"pantheon",ll:[41.8986,12.4769],dur:"30–40 min",
+ lead:"Najlepiej zachowana budowla starożytnego Rzymu. Jej kopuła od prawie 1900 lat pozostaje największą na świecie z niezbrojonego betonu.",
+ hist:["Napis na fasadzie głosi, że zbudował go Marek Agryppa w swoim trzecim konsulacie. To jednak skromność cesarza Hadriana: oryginał Agryppy spłonął, a obecny budynek powstał ok. 113–125 roku n.e. Hadrian zostawił napis poprzednika.",
+  "W 609 roku papież Bonifacy IV przekształcił świątynię wszystkich bogów w kościół Santa Maria ad Martyres. To uratowało ją przed rozbiórką. Pochowano tu m.in. Rafaela i pierwszych królów zjednoczonych Włoch."],
+ facts:["Średnica kopuły (43,3 m) jest równa wysokości wnętrza, więc w budynku zmieściłaby się idealna kula.",
+  "Oculus w szczycie ma ok. 9 m średnicy i nie ma szyby. Kiedy pada, deszcz wpada do środka i spływa przez 22 otworki w lekko wypukłej posadzce.",
+  "Beton kopuły jest coraz lżejszy ku górze. Rzymianie dodawali do niego pumeks, a grubość ścian maleje od ok. 6 m do ok. 1,2 m.",
+  "Papież Urban VIII z rodu Barberinich zdarł brąz z portyku. Rzymianie ukuli wtedy powiedzenie: „Quod non fecerunt barbari, fecerunt Barberini”, czyli „czego nie zrobili barbarzyńcy, zrobili Barberini”.",
+  "W Zielone Świątki strażacy zrzucają przez oculus tysiące płatków róż."],
+ info:[["Bilet","5 € (od 2023 r.). Można kupić online lub w automacie na miejscu."],["Godziny","Zwykle 9:00–19:00. W weekend w porach mszy (m.in. sobota ok. 17:00) zwiedzanie jest wstrzymane."]],
+ tip:"Celujcie przed 16:45. Najlepsze lody w okolicy są w Giolitti (Via degli Uffici del Vicario) albo w Della Palma."},
+trevi:{name:"Fontanna di Trevi",orig:"Fontana di Trevi",img:"trevi",ll:[41.9009,12.4833],dur:"20–30 min",
+ lead:"Największa barokowa fontanna Rzymu, ostatni przystanek antycznego akweduktu i rekwizyt ze „Słodkiego życia”.",
+ hist:["Woda płynie tu akweduktem Aqua Virgo, który w 19 roku p.n.e. zbudował Marek Agryppa i który działa do dziś. Według legendy źródło wskazała żołnierzom młoda dziewczyna (virgo), stąd nazwa.",
+  "Obecną fontannę zaprojektował Nicola Salvi. Budowa trwała w latach 1732–1762, a ukończył ją Giuseppe Pannini, bo Salvi zmarł wcześniej. Fontanna ma 26 m wysokości i 49 m szerokości. W centrum stoi Okeanos na rydwanie z muszli ciągniętym przez trytony i konie, jednego spokojnego i jednego wzburzonego, jak morze."],
+ facts:["Monetę wrzuca się prawą ręką przez lewe ramię. Jedna oznacza powrót do Rzymu, dwie nową miłość, trzy ślub.",
+  "Ludzie wrzucają ok. 1,5 mln € rocznie, czyli kilka tysięcy euro dziennie. Pieniądze trafiają do Caritasu.",
+  "Na prawym brzegu stoi duża kamienna waza, zwana „asso di coppe”. Salvi postawił ją podobno po to, żeby zasłonić widok golibrodzie, który krytykował jego pracę ze swojego zakładu.",
+  "W 1960 roku Anita Ekberg brodziła tu w „Słodkim życiu” Felliniego. Dziś za wejście do wody grozi mandat."],
+ info:[["Wstęp","Plac jest bezpłatny. Od 2026 r. zejście na dolny taras przy niecce jest płatne (ok. 2 €). Sprawdźcie na miejscu."],["Najlepsza pora","Wieczorem z podświetleniem albo o świcie, przed 8:00, kiedy jest prawie pusto."]],
+ tip:"Uważajcie na kieszonkowców, bo w tłumie przy fontannie mają najlepsze warunki. Telefon trzymajcie w ręku albo w zapiętej kieszeni."},
+vittoriano:{name:"Ołtarz Ojczyzny",orig:"Vittoriano / Altare della Patria",img:"vittoriano",ll:[41.8946,12.4831],dur:"30–45 min",
+ lead:"Gigantyczny biały pomnik zjednoczenia Włoch. Rzymianie go nie lubią, ale widok z jego tarasów jest jednym z najlepszych w mieście.",
+ hist:["Pomnik Wiktora Emanuela II, pierwszego króla zjednoczonych Włoch, budowano w latach 1885–1935. Odsłonięto go w 1911 roku, na 50-lecie zjednoczenia. Pod budowę zburzono całą średniowieczną dzielnicę na stoku Kapitolu.",
+  "Od 1921 roku znajduje się tu Grób Nieznanego Żołnierza, przy którym stale trzymają wartę żołnierze z wieczną lampą."],
+ facts:["Rzymianie nazywają pomnik „maszyną do pisania” (la macchina da scrivere) i „tortem weselnym”, bo śnieżnobiały marmur z Brescii zupełnie nie pasuje do ciepłego trawertynu miasta.",
+  "Konny posąg króla jest tak wielki, że przed jego ustawieniem odlewnicy zjedli w brzuchu konia uroczysty obiad. Zachowało się zdjęcie.",
+  "Z tarasu Quadrighe widać jednocześnie Koloseum, Forum, kopułę św. Piotra i dachy centrum."],
+ info:[["Wstęp","Schody i niższe tarasy są bezpłatne. Winda panoramiczna „Roma dal Cielo” jest płatna (kilkanaście €)."],["Zasady","Nie wolno siadać na schodach. Pilnują tego strażnicy z gwizdkami."]],
+ tip:"Za pomnikiem, po lewej stronie, schody prowadzą prosto na Kapitol. Nie trzeba schodzić na dół."},
+campidoglio:{name:"Plac Kapitoliński",orig:"Piazza del Campidoglio",img:"campidoglio",ll:[41.8934,12.4828],dur:"30 min",
+ lead:"Najświętsze wzgórze starożytnego Rzymu, które Michał Anioł zamienił w renesansowy plac. Z tyłu jest darmowy widok na Forum.",
+ hist:["Na Kapitolu, najmniejszym z siedmiu wzgórz, stała świątynia Jowisza Najlepszego Największego, religijne centrum Rzymu. To od tej nazwy pochodzi słowo „kapitol”, np. Kapitol w Waszyngtonie.",
+  "W 1536 roku, po wizycie cesarza Karola V, papież Paweł III zlecił Michałowi Aniołowi przebudowę zaniedbanego wzgórza. Michał Anioł zaprojektował trapezowy plac, fasady trzech pałaców i łagodne schody Cordonata, po których dało się wjechać konno."],
+ facts:["Posąg konny Marka Aureliusza przetrwał średniowiecze tylko dlatego, że brano go za Konstantyna, pierwszego chrześcijańskiego cesarza. Wszystkie inne brązy pogańskich cesarzy przetopiono. Na placu stoi kopia, a oryginał jest w muzeum.",
+  "Gwiaździsty wzór posadzki Michała Anioła zrealizowano dopiero w 1940 roku, 400 lat po projekcie.",
+  "Muzea Kapitolińskie (1471) to najstarsze muzeum publiczne na świecie. W środku jest oryginalna Wilczyca Kapitolińska.",
+  "Nieopodal jest Skała Tarpejska, z której w starożytności zrzucano zdrajców."],
+ info:[["Wstęp","Plac i punkty widokowe są bezpłatne."],["Punkt widokowy","Obejdźcie Palazzo Senatorio z prawej lub lewej strony (Via del Campidoglio). Z tarasów jest panorama całego Forum Romanum."]],
+ tip:"Ten widok na Forum przyda się też po południu, bo zobaczycie z góry, którędy będziecie chodzić."},
+bocca:{name:"Usta Prawdy",orig:"Bocca della Verità",img:"bocca",ll:[41.8881,12.4815],dur:"15–30 min (kolejka)",
+ lead:"Antyczna marmurowa maska, która według legendy odgryza rękę kłamcom. Znana z „Rzymskich wakacji”.",
+ hist:["Marmurowy krąg ma ok. 1,75 m średnicy i waży ok. 1,3 tony. Pochodzi z I wieku n.e. i przedstawia twarz bóstwa rzecznego lub Okeanosa. Najpewniej była to pokrywa studzienki kanalizacyjnej albo element fontanny.",
+  "W 1632 roku ustawiono ją w portyku kościoła Santa Maria in Cosmedin. W średniowieczu narodziła się legenda, że osoba, która włoży rękę i skłamie, straci dłoń."],
+ facts:["W „Rzymskich wakacjach” (1953) Gregory Peck udawał, że maska odgryzła mu rękę. Nie uprzedził Audrey Hepburn, więc jej krzyk w filmie jest prawdziwy.",
+  "W kościele za maską przechowywana jest relikwia przypisywana św. Walentemu, czaszka w wianku z kwiatów.",
+  "Kościół Santa Maria in Cosmedin ma jedną z najładniejszych romańskich dzwonnic w Rzymie, z XII wieku."],
+ info:[["Wstęp","Symboliczna opłata ok. 2 €. Kolejka idzie szybko."],["Godziny","Zwykle ok. 9:30–17:30."]],
+ tip:"Naprzeciwko stoją dwie świątynie antyczne (Herkulesa Zwycięzcy i Portunusa), jedne z najlepiej zachowanych z czasów republiki."},
+circo:{name:"Circus Maximus",orig:"Circo Massimo",img:"circo",ll:[41.8861,12.4851],dur:"20 min spacerem",
+ lead:"Największy stadion starożytnego świata. Dziś to długa trawiasta niecka pod ruinami cesarskich pałaców.",
+ hist:["Wyścigi rydwanów odbywały się w tej dolinie między Palatynem a Awentynem już w VI wieku p.n.e. W szczytowym okresie cyrk miał ok. 600 m długości i mieścił 150–250 tys. widzów. Żaden stadion na świecie nie zbliżył się do tej liczby.",
+  "Rydwany robiły 7 okrążeń wokół środkowej spiny ozdobionej obeliskami. Ostatnie wyścigi zorganizował w 549 roku król Ostrogotów Totila."],
+ facts:["Obelisk, który w poniedziałek zobaczycie na Piazza del Popolo, stał kiedyś właśnie tu, na spinie cyrku. Przywiózł go z Egiptu August.",
+  "Woźnice dzielili się na stronnictwa (Zieloni, Niebiescy, Czerwoni, Biali), a ich kibice potrafili wywoływać zamieszki.",
+  "Dziś odbywają się tu wielkie koncerty i świętowania. W 2006 roku ok. 700 tys. osób fetowało tu mistrzostwo świata w piłce nożnej."],
+ info:[["Wstęp","Bezpłatny (to park)."]],
+ tip:"Idźcie wzdłuż cyrku w stronę Koloseum (Via di San Gregorio, ok. 15 min). Po prawej będziecie mieć ruiny Palatynu."},
+colosseum:{name:"Koloseum",orig:"Colosseo / Amphitheatrum Flavium",img:"colosseum",ll:[41.8902,12.4922],dur:"1–1,5 h",
+ lead:"Symbol Rzymu i jeden z siedmiu nowych cudów świata. Amfiteatr na 50–80 tys. widzów, zbudowany w niecałe 10 lat.",
+ hist:["Budowę zaczął cesarz Wespazjan ok. 72 roku n.e. na miejscu sztucznego jeziora Złotego Domu Nerona. Był to gest polityczny: oddał ludowi teren prywatnej rezydencji tyrana. Finansowano ją m.in. łupami ze zdobytej Jerozolimy. Jego syn Tytus otworzył amfiteatr w 80 roku igrzyskami, które trwały 100 dni i w których zginęło ok. 9000 zwierząt.",
+  "Walki gladiatorów trwały do V wieku, a polowania na zwierzęta do VI. Potem budowla była fortecą, kamieniołomem i schronieniem. Trzęsienie ziemi w 1349 roku zawaliło południową ścianę, a trawertyn rozebrano m.in. na Pałac Wenecki i Bazylikę św. Piotra."],
+ facts:["Nazwa „Koloseum” nie pochodzi od wielkości budowli, tylko od stojącego obok kolosalnego, 35-metrowego posągu Nerona.",
+  "Dziury w murach to ślady po żelaznych klamrach, które w średniowieczu wydłubywano i przetapiano.",
+  "Nad widownią rozpinano płócienny dach (velarium). Obsługiwali go marynarze floty z Misenum, bo znali się na takielunku.",
+  "Pod areną było hypogeum: korytarze i windy, którymi zwierzęta i dekoracje nagle „wyrastały” spod piasku.",
+  "Widzowie mieli numerowane bilety (tesserae), a 76 z 80 wejść było ponumerowanych. System ewakuacji opróżniał budynek w kilkanaście minut."],
+ info:[["Wasz bilet","Niedziela, 13:00. Bilet jest imienny, więc weźcie dowód osobisty. Bądźcie przy wejściu ok. 12:30."],["Forum i Palatyn","Standardowy bilet obejmuje też Forum Romanum i Palatyn (zwykle ważne 24 h). Sprawdźcie w swoim bilecie."],["Bagaż","Bez dużych plecaków i szklanych butelek. W środku jest kranik z wodą pitną."]],
+ tip:"Nie jedzcie w restauracjach z widokiem na Koloseum i menu ze zdjęciami. W Monti (10 min pieszo) jest lepiej i taniej."},
+constantine:{name:"Łuk Konstantyna",orig:"Arco di Costantino",img:"constantine",ll:[41.8898,12.4906],dur:"10 min",
+ lead:"Największy zachowany łuk triumfalny Rzymu, stojący tuż obok Koloseum.",
+ hist:["Senat wzniósł łuk w 315 roku dla uczczenia zwycięstwa Konstantyna nad Maksencjuszem w bitwie przy Moście Mulwijskim (312). Według tradycji przed tą bitwą Konstantyn zobaczył znak krzyża i słowa „In hoc signo vinces”, „w tym znaku zwyciężysz”."],
+ facts:["Łuk jest w dużej części „z recyklingu”. Płaskorzeźby zabrano z pomników Trajana, Hadriana i Marka Aureliusza, a twarzom dawnych cesarzy przerzeźbiono rysy na Konstantyna.",
+  "Na olimpiadzie w 1960 roku meta maratonu była właśnie przy tym łuku. Wbiegł na nią boso Etiopczyk Abebe Bikila."],
+ info:[["Wstęp","Ogląda się z zewnątrz, za darmo."]],
+ tip:"Najlepsze zdjęcie łuku z Koloseum w tle robi się z Via Sacra, idąc w stronę wejścia na Palatyn."},
+palatine:{name:"Palatyn",orig:"Palatino",img:"palatine",ll:[41.8894,12.4875],dur:"45–60 min",
+ lead:"Wzgórze, na którym według legendy Romulus założył Rzym, a cesarze zbudowali swoje pałace.",
+ hist:["Według tradycji Romulus założył tu miasto 21 kwietnia 753 roku p.n.e. Archeolodzy rzeczywiście znaleźli ślady chat z VIII wieku p.n.e. U stóp wzgórza miała być grota Lupercal, w której wilczyca karmiła bliźnięta.",
+  "W czasach republiki mieszkali tu najbogatsi Rzymianie, a od Augusta cesarze. Domicjan zbudował ogromny kompleks pałacowy (Domus Flavia i Domus Augustana), który był siedzibą władców przez kolejne stulecia."],
+ facts:["Słowo „pałac” (i „palace”, „palazzo”) pochodzi właśnie od Palatium, nazwy tego wzgórza.",
+  "W Domu Augusta i Domu Liwii zachowały się żywe kolorowe freski sprzed ponad 2000 lat.",
+  "Ogrody Farnese z XVI wieku należały do pierwszych ogrodów botanicznych w Europie. Z ich tarasu jest najlepszy widok na Forum Romanum."],
+ info:[["Wstęp","W ramach biletu do Koloseum (sprawdźcie)."],["Godziny","W listopadzie zamykają ok. 16:30, ostatnie wejście ok. 15:30."]],
+ tip:"Zacznijcie od Palatynu i schodźcie w dół na Forum. Tak się chodzi łatwiej i kończy przy wyjściu od strony Kapitolu."},
+forum:{name:"Forum Romanum",orig:"Foro Romano",img:"forum",ll:[41.8925,12.4853],dur:"1–1,5 h",
+ lead:"Centrum życia starożytnego Rzymu: senat, świątynie, trybuny mówców i Via Sacra, którą przechodziły triumfy.",
+ hist:["Przez ponad tysiąc lat to była dolina, w której toczyło się życie publiczne Rzymu. Tu przemawiali Cyceron i Marek Antoniusz, tu zbierał się senat, tu spalono ciało Juliusza Cezara po jego zabójstwie w 44 roku p.n.e.",
+  "Po upadku cesarstwa Forum zasypały ziemia i gruz. W średniowieczu nazywano je Campo Vaccino, czyli „krowim pastwiskiem”. Systematyczne wykopaliska ruszyły dopiero w XIX wieku."],
+ facts:["W miejscu, gdzie spalono Cezara (Świątynia Boskiego Juliusza), do dziś ludzie zostawiają kwiaty, zwłaszcza 15 marca.",
+  "Westalki strzegły świętego ognia przez 30 lat. Za złamanie ślubu czystości karano je zamurowaniem żywcem.",
+  "Słowo „rostrum” (mównica) pochodzi od dziobów okrętów zdobytych w 338 r. p.n.e., którymi ozdobiono trybunę.",
+  "Na Łuku Tytusa widać rzymskich żołnierzy niosących menorę z jerozolimskiej świątyni. Przez wieki rzymscy Żydzi nie przechodzili pod tym łukiem."],
+ info:[["Wstęp","W ramach biletu do Koloseum (sprawdźcie)."],["Godziny","W listopadzie do ok. 16:30, ostatnie wejście ok. 15:30."]],
+ tip:"Kurie (budynek senatu) zachowały się w całości, bo zamieniono je w kościół. Wejdźcie do środka."},
+monti:{name:"Monti i Fora Cesarskie",orig:"Rione Monti, Via dei Fori Imperiali",img:"monti",ll:[41.8952,12.4920],dur:"1 h + aperitivo",
+ lead:"Najstarsza dzielnica Rzymu, dawna slumsowa Subura, dziś pełna winiarni i małych sklepów.",
+ hist:["W starożytności Subura była zatłoczoną, hałaśliwą dzielnicą biedoty u stóp Eskwilinu. Wychował się tu Juliusz Cezar, którego ród był arystokratyczny, ale nie bogaty.",
+  "Szeroką Via dei Fori Imperiali przebił w 1932 roku Mussolini, żeby mieć prostą trasę defilad z Placu Weneckiego do Koloseum. Zburzył przy tym całą dzielnicę i zasypał część forów cesarskich."],
+ facts:["Kolumna Trajana (113 r.) jest owinięta spiralnym fryzem długości ok. 190 m z ok. 2500 postaciami, który opowiada o wojnach z Dakami. Na szczycie od 1587 roku stoi św. Piotr.",
+  "Targi Trajana z II wieku bywają nazywane pierwszym centrum handlowym na świecie.",
+  "Wieczorem rzymianie siedzą na stopniach fontanny na Piazza della Madonna dei Monti z kieliszkiem wina."],
+ info:[["Wstęp","Spacer bezpłatny. Fora cesarskie dobrze widać z ulicy."]],
+ tip:"Aperitivo, czyli spritz z przekąskami ok. 18:00, to dobry sposób na odpoczynek po całym dniu chodzenia."},
+trastevere:{name:"Trastevere",orig:"Trastevere",img:"trastevere",ll:[41.8895,12.4699],dur:"wieczór",
+ lead:"Brukowane uliczki, bluszcz na ścianach i najlepsze trattorie. Za Tybrem najlepiej spędzić wieczór.",
+ hist:["Nazwa to „trans Tiberim”, czyli za Tybrem. W starożytności mieszkali tu marynarze, rzemieślnicy i cudzoziemcy, a także jedna z najstarszych gmin żydowskich w Europie. Mieszkańcy do dziś mówią o sobie „noantri” (my inni) i mają w lipcu swoje święto, Festa de' Noantri.",
+  "Sercem dzielnicy jest Santa Maria in Trastevere, jeden z najstarszych kościołów Rzymu. Według tradycji założył go papież Kalikst I w III wieku, a obecny kształt i złote mozaiki pochodzą z XII–XIII wieku."],
+ facts:["Według legendy w 38 roku p.n.e. w miejscu kościoła trysnęło z ziemi źródło oleju, co miało zapowiadać narodziny Chrystusa.",
+  "Ulice wyłożone są „sampietrini”: kostkami z bazaltu nazwanymi od placu św. Piotra, gdzie użyto ich po raz pierwszy. Wygodne buty to obowiązek.",
+  "Do Trastevere najładniej dojść pieszo z centrum przez dzielnicę Żydowską (Getto) i Wyspę Tyberyjską."],
+ info:[["Dojazd","Tramwaj 8 z Piazza Venezia albo spacer ok. 25 min z Monti."],["Kolacja","Rezerwujcie stolik albo bądźcie przed 19:30. Rzymianie jedzą ok. 20:30–21:00."]],
+ tip:"Spróbujcie supplì (smażonej kulki ryżowej z mozzarellą) i jednego z czterech rzymskich makaronów: cacio e pepe, carbonara, amatriciana albo gricia."},
+spagna:{name:"Schody Hiszpańskie",orig:"Scalinata di Trinità dei Monti",img:"spagna",ll:[41.9060,12.4828],dur:"30 min",
+ lead:"135 stopni z placu Hiszpańskiego do kościoła Trinità dei Monti, a u ich stóp fontanna w kształcie łodzi.",
+ hist:["Schody zbudowano w latach 1723–1725 według projektu Francesca De Sanctisa. Zapłacili za nie Francuzi, bo na górze stoi francuski kościół Trinità dei Monti. Nazwa pochodzi od ambasady Hiszpanii przy Stolicy Apostolskiej, która od XVII wieku mieści się przy placu.",
+  "Fontannę Barcaccia (1627–1629) wyrzeźbił Pietro Bernini z synem Gian Lorenzem. Legenda mówi, że po wielkiej powodzi w 1598 roku na placu osiadła łódź, która stała się inspiracją."],
+ facts:["Barcaccia jest zagłębiona w ziemi, bo ciśnienie wody z akweduktu Aqua Virgo było tu za słabe na wysoki strumień. Bernini zrobił z tego problemu atut projektu.",
+  "W domu po prawej stronie schodów zmarł w 1821 roku angielski poeta John Keats. Dziś mieści się tam muzeum Keatsa i Shelleya.",
+  "Od 2019 roku nie wolno siadać na schodach. Grozi za to mandat do kilkuset euro.",
+  "Antico Caffè Greco przy Via Condotti działa od 1760 roku. Bywali w nim Goethe, Byron i Keats."],
+ info:[["Wstęp","Bezpłatny."],["Metro","Spagna (linia A)."]],
+ tip:"Rano przed 9:00 schody są prawie puste i to najlepszy moment na zdjęcia."},
+pincio:{name:"Taras Pincio",orig:"Terrazza del Pincio",img:"pincio",ll:[41.9113,12.4793],dur:"30 min",
+ lead:"Taras widokowy nad Piazza del Popolo, z którego widać kopułę św. Piotra i dachy całego centrum.",
+ hist:["Wzgórze nazywa się od rodu Pincii, który miał tu willę w IV wieku. Obecny ogród z tarasem zaprojektował Giuseppe Valadier na początku XIX wieku, w czasach napoleońskich. Ogród łączy się z parkiem Villa Borghese."],
+ facts:["W alejkach stoi ok. 230 marmurowych popiersi sławnych Włochów. Wiele z nich ma utrącone nosy, bo to ulubiony cel wandali.",
+  "Zegar wodny (idrocronometro) z 1867 roku do dziś odmierza czas siłą wody.",
+  "Galeria Borghese w parku jest w poniedziałki zamknięta, więc tym razem tylko spacer."],
+ info:[["Wstęp","Bezpłatny."]],
+ tip:"Z Placu Hiszpańskiego idźcie górą Viale della Trinità dei Monti (ok. 10 min) i zejdźcie schodami prosto na Piazza del Popolo."},
+popolo:{name:"Piazza del Popolo",orig:"Piazza del Popolo",img:"popolo",ll:[41.9107,12.4763],dur:"45 min",
+ lead:"Dawna północna brama Rzymu z egipskim obeliskiem, „bliźniaczymi” kościołami i dwoma Caravaggiami.",
+ hist:["Przez Porta del Popolo wjeżdżali do Rzymu podróżni z północy, Via Flaminia. Plac miał robić na nich wrażenie. Obelisk Ramzesa II z Heliopolis (ok. 1300 p.n.e.) przywiózł August w 10 roku p.n.e. do Circus Maximus, a w 1589 roku papież Sykstus V ustawił go tutaj.",
+  "Do 1826 roku na placu odbywały się publiczne egzekucje."],
+ facts:["Kościoły Santa Maria dei Miracoli i Santa Maria in Montesanto wyglądają jak bliźniaki, ale nimi nie są. Działki miały różną szerokość, więc jeden ma kopułę owalną, a drugi okrągłą. Iluzję dopracowali Rainaldi i Bernini.",
+  "Kościół Santa Maria del Popolo stanął w 1099 roku w miejscu orzecha, pod którym miał straszyć duch Nerona. Papież Paschalis II kazał drzewo ściąć.",
+  "W Kaplicy Cerasi wiszą dwa Caravaggia: „Nawrócenie św. Pawła” i „Ukrzyżowanie św. Piotra”. Wstęp darmowy.",
+  "Kaplica Chigi (Rafael i Bernini) gra ważną rolę w „Aniołach i demonach” Dana Browna."],
+ info:[["Wstęp","Plac i kościół są bezpłatne. Kościół zwykle ma przerwę w porze obiadowej."]],
+ tip:"Santa Maria del Popolo stoi przy samej bramie, po lewej stronie placu, gdy patrzy się od Via del Corso."},
+campo:{name:"Campo de' Fiori",orig:"Campo de' Fiori",img:"campo",ll:[41.8956,12.4722],dur:"45 min + obiad",
+ lead:"Codzienny targ, posąg spalonego filozofa i jedyny duży plac w Rzymie bez kościoła.",
+ hist:["W średniowieczu była tu łąka, stąd nazwa „pole kwiatów”. Plac stał się miejscem handlu i egzekucji. 17 lutego 1600 roku Inkwizycja spaliła tu na stosie filozofa Giordano Bruno.",
+  "W 1889 roku, już w świeckich Włoszech, postawiono mu pomnik. Bruno w kapturze patrzy prosto w stronę Watykanu."],
+ facts:["Pod sąsiednimi kamienicami kryje się Teatr Pompejusza z 55 roku p.n.e. Łuk ulicy Via di Grottapinta wiernie powtarza kształt jego widowni.",
+  "5 minut dalej, na Largo di Torre Argentina, w kurii Pompejusza zamordowano Juliusza Cezara. Dziś w ruinach mieszka kolonia kotów z sanktuarium dla nich.",
+  "Forno Campo de' Fiori w rogu placu piecze klasyczną rzymską pizza bianca, a najlepsza jest jeszcze ciepła."],
+ info:[["Targ","Pn–sb, mniej więcej 7:00–14:00."],["Wstęp","Bezpłatny."]],
+ tip:"Stragany z przyprawami i „limoncello” są dla turystów. Kupujcie raczej w sklepach w bocznych uliczkach."}
+};
+
+const DAYS = [
+ {id:"sob",num:"I",name:"Sobota",it:"Sabato",theme:"Watykan i serce centrum",km:"≈ 9 km pieszo",
+  line:"Rano Watykan (wejście o najwcześniejszej godzinie), potem przez Tyber do barokowego centrum. Kończymy wieczorem przy Fontannie di Trevi.",
+  items:[
+   {t:"07:45",note:"Śniadanie",text:"<b>Cornetto i cappuccino przy barze.</b> Na stojąco jest taniej niż przy stoliku. Do wejścia do Muzeów najlepiej dojechać metrem A do stacji Ottaviano."},
+   {t:"08:30",p:"vatican",tags:["book"]},
+   {t:"11:00",p:"sistine"},
+   {t:"11:45",p:"stpeter",tags:["free"]},
+   {t:"13:30",note:"Obiad",text:"<b>Borgo Pio albo Prati.</b> Pizza al taglio (na wagę) albo trattoria. Omijajcie lokale tuż przy Via della Conciliazione."},
+   {t:"14:45",p:"castel"},
+   {t:"15:45",p:"navona",tags:["free"]},
+   {t:"16:30",p:"pantheon"},
+   {t:"17:30",p:"trevi"},
+   {t:"19:30",note:"Kolacja",text:"<b>Okolice Pantheonu albo Monti.</b> Przy samej Trevi jest drogo i turystycznie."}
+  ]},
+ {id:"nd",num:"II",name:"Niedziela",it:"Domenica",theme:"Starożytny Rzym",km:"≈ 8 km pieszo",
+  line:"Rano Kapitol i okolice Tybru, wczesny obiad, o 13:00 Koloseum, potem Palatyn i Forum do zamknięcia. Wieczór w Monti i Trastevere.",
+  items:[
+   {t:"08:45",p:"vittoriano",tags:["free"]},
+   {t:"09:30",p:"campidoglio",tags:["free"]},
+   {t:"10:15",p:"bocca"},
+   {t:"10:50",p:"circo",tags:["free"]},
+   {t:"11:30",note:"Obiad przed Koloseum",text:"<b>Monti lub Celio, ok. 11:30–12:20.</b> Większość trattorii otwiera się ok. 12:00, więc wczesny obiad jest w sam raz. Albo szybciej: pizza al taglio w Monti."},
+   {t:"12:30",note:"Przy wejściu",text:"<b>Bądźcie przy Koloseum o 12:30.</b> Kontrola bezpieczeństwa i sprawdzanie imiennych biletów. Weźcie dowody."},
+   {t:"13:00",p:"colosseum",tags:["fixed"]},
+   {t:"14:20",p:"constantine",tags:["free"]},
+   {t:"14:30",p:"palatine"},
+   {t:"15:30",p:"forum"},
+   {t:"17:00",p:"monti"},
+   {t:"19:00",p:"trastevere"}
+  ]},
+ {id:"pon",num:"III",name:"Poniedziałek",it:"Lunedì",theme:"Spacer i powrót",km:"≈ 6 km pieszo",
+  line:"Lekki poranek: Schody Hiszpańskie, taras Pincio, Piazza del Popolo i targ na Campo de' Fiori. Ok. 16:00 wyjazd na lotnisko na lot o 19:00.",
+  items:[
+   {t:"08:00",note:"Wymeldowanie",text:"<b>Zostawcie bagaże w hotelu</b> albo w przechowalni (np. Bounce / Radical Storage przy Termini)."},
+   {t:"08:45",p:"spagna",tags:["free"]},
+   {t:"09:30",p:"pincio",tags:["free"]},
+   {t:"10:15",p:"popolo",tags:["free"]},
+   {t:"11:15",note:"Spacer",text:"<b>Via del Corso → Via dei Coronari.</b> Ok. 30 min spacerem albo autobusem. Po drodze możecie zajrzeć jeszcze raz do Pantheonu lub Trevi o porannej porze."},
+   {t:"12:00",p:"campo",tags:["free"]},
+   {t:"13:30",note:"Ostatnie gelato",text:"<b>Prawdziwe lody poznacie po stonowanych kolorach</b> i metalowych pojemnikach z pokrywkami. Pistacja powinna być szarozielona, nie jaskrawa."},
+   {t:"15:00",note:"Bagaże",text:"<b>Odbiór bagaży.</b>"},
+   {t:"16:00",note:"Wyjazd na lotnisko",text:"<b>Fiumicino:</b> Leonardo Express z Termini (32 min, ok. 14 €) albo taxi za stałą stawkę 55 €. <b>Ciampino:</b> autobus z Termini ok. 40 min. Bądźcie na lotnisku ok. 17:00."}
+  ]}
+];
+
+const TODO = [
+ ["vat","Kupić bilety do Muzeów Watykańskich na sobotę","Tylko museivaticani.va. Najwcześniejszy slot (8:00–9:00). Sprzedają się szybko."],
+ ["col","Sprawdzić bilet do Koloseum","Czy obejmuje Forum i Palatyn, czy jest imienny? Dowody na niedzielę."],
+ ["pan","(opcjonalnie) Bilet do Pantheonu online","5 €, oszczędza kolejkę do automatu."],
+ ["din","Zarezerwować kolację w Trastevere na niedzielę","Najlepsze miejsca są pełne w weekend."],
+ ["lug","Zaplanować przechowanie bagażu na poniedziałek","Hotel albo przechowalnia."],
+ ["air","Sprawdzić lotnisko i transport na poniedziałek","Fiumicino czy Ciampino, bilet na Leonardo Express w aplikacji Trenitalia."]
+];
+
+const $ = s => document.querySelector(s);
+const store = {
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+let visited = new Set(store.get("rzym-visited",[]));
+let todo = new Set(store.get("rzym-todo",[]));
+const PILL = {book:["KUP BILET",""],free:["za darmo",""],fixed:["stała godzina","fixed"]};
+const maps = ll => `https://www.google.com/maps/dir/?api=1&destination=${ll[0]},${ll[1]}&travelmode=walking`;
+
+function todayIdx(){const d=new Date().getDay();return d===6?0:d===0?1:d===1?2:-1}
+function nowMin(){const n=new Date();return n.getHours()*60+n.getMinutes()}
+const toMin = t => {const [h,m]=t.split(":");return +h*60+ +m};
+
+function renderTabs(active){
+  $("#tabs").innerHTML = DAYS.map(d=>`<button class="tab" data-go="${d.id}" aria-current="${active===d.id}"><b>${d.num}</b><span>${d.name.slice(0,3)}.</span></button>`).join("")
+   + `<button class="tab" data-go="info" aria-current="${active==="info"}"><b>✦</b><span>Info</span></button>`;
+}
+
+function renderDay(d){
+  const di = DAYS.indexOf(d);
+  const places = d.items.filter(i=>i.p);
+  const done = places.filter(i=>visited.has(i.p)).length;
+  let nowI=-1;
+  if(todayIdx()===di){const m=nowMin();d.items.forEach((it,i)=>{if(toMin(it.t)<=m) nowI=i});}
+  const route = places.map(i=>PLACES[i.p].ll.join(","));
+  const routeUrl = `https://www.google.com/maps/dir/?api=1&origin=${route[0]}&destination=${route[route.length-1]}&waypoints=${route.slice(1,-1).join("|")}&travelmode=walking`;
+  $("#app").innerHTML = `
+   <div class="brand"><h1>ROMA · 3 DNI</h1><span>${done}/${places.length} zaliczone</span></div>
+   <header class="dayhead"><div class="numeral">${d.num}</div><div class="it">${d.name} · ${d.it}</div><h2>${d.theme}</h2></header>
+   <p class="dayline">${d.line}</p>
+   <div class="progress"><i style="width:${places.length?done/places.length*100:0}%"></i></div>
+   <div class="daymeta"><span class="chip">${d.km}</span><span class="chip">${places.length} miejsc</span>
+     <a class="btn" href="${routeUrl}" target="_blank" rel="noopener">Trasa dnia w Mapach ↗</a></div>
+   <ol class="tl">${d.items.map((it,i)=>{
+     const now = i===nowI ? `<span class="pill now">teraz</span>`:"";
+     if(it.note) return `<li><div class="note"><span class="time">${it.t}</span><div class="body">${now?now+" ":""}<b>${it.note}.</b> ${it.text}</div></div></li>`;
+     const p = PLACES[it.p], v = visited.has(it.p);
+     const pills = (it.tags||[]).map(t=>`<span class="pill ${PILL[t][1]}">${PILL[t][0]}</span>`).join("") + (v?`<span class="pill done">✓ zaliczone</span>`:"") + now;
+     return `<li class="${v?"visited":""}"><button class="stop" data-place="${it.p}">
+       <span class="time">${it.t}</span><img class="thumb" src="img/${p.img}.jpg" alt="" loading="lazy">
+       <span class="txt"><h3>${p.name}</h3><p>${p.lead}</p><span class="pills"><span class="pill" style="background:none;padding-left:0;color:var(--muted)">${p.dur}</span>${pills}</span></span></button></li>`;
+   }).join("")}</ol>`;
+}
+
+function renderInfo(){
+  $("#app").innerHTML = `
+   <div class="brand"><h1>ROMA · 3 DNI</h1><span>praktycznie</span></div>
+   <header class="dayhead"><div class="numeral">✦</div><div class="it">Prima di partire</div><h2>Przed wyjazdem i na miejscu</h2></header>
+   <section class="sec"><h3>Do zrobienia</h3><div class="card"><ul class="todo">${TODO.map(([id,t,s])=>`
+     <li><label for="td-${id}"><input type="checkbox" id="td-${id}" data-todo="${id}" ${todo.has(id)?"checked":""}><span>${t}<small>${s}</small></span></label></li>`).join("")}</ul></div></section>
+   <section class="sec"><h3>Plan B: Watykan</h3><div class="card"><p style="margin:0">Jeśli na sobotę nie będzie biletów, zamieńcie poranki. W <b>poniedziałek</b> weźcie slot 8:00 do Muzeów i Bazylikę do ok. 12:30 (spokojnie zdążycie na lot). Spacer Schody Hiszpańskie → Pincio → Piazza del Popolo zróbcie w sobotę rano. Muzea Watykańskie są w <b>niedzielę zamknięte</b>. Uważajcie na nieoficjalne strony z biletami po zawyżonych cenach.</p></div></section>
+   <section class="sec"><h3>Transport</h3><div class="card"><dl class="kv">
+     <dt>Bilet BIT</dt><dd>1,50 €, 100 min na metro, autobusy i tramwaje (w metrze tylko 1 przejazd). Można płacić zbliżeniowo kartą przy bramce i w autobusie.</dd>
+     <dt>Metro</dt><dd>Linia A: Ottaviano (Watykan), Spagna, Flaminio (Piazza del Popolo). Linia B: Colosseo, Circo Massimo.</dd>
+     <dt>Taxi</dt><dd>Tylko białe z napisem TAXI, przez aplikację FreeNow lub itTaxi. Stała stawka Fiumicino ↔ centrum: 55 €.</dd>
+     <dt>Lotnisko</dt><dd>Leonardo Express Termini → Fiumicino: 32 min, ok. 14 €. Autobusy na Ciampino spod Termini: ok. 40 min.</dd>
+   </dl></div></section>
+   <section class="sec"><h3>Dobre rady</h3><ul class="tips">
+     <li><b>Woda za darmo:</b> z ulicznych fontanienek (nasoni). Zatkajcie palcem dolny wylot, a woda tryśnie z otworka u góry.</li>
+     <li><b>Kościoły:</b> zakryte ramiona i kolana. Przyda się cienki szal w plecaku.</li>
+     <li><b>Coperto</b> (1,5–3 € od osoby) na rachunku jest normalne. Napiwek nie jest obowiązkowy.</li>
+     <li><b>Kawa przy barze</b> kosztuje ok. 1,20–1,50 €, przy stoliku nawet trzy razy więcej.</li>
+     <li><b>Kieszonkowcy:</b> metro A, autobus 64 (do Watykanu), tłumy przy Trevi.</li>
+     <li><b>Mandaty:</b> za siadanie na Schodach Hiszpańskich i Vittoriano, jedzenie przy zabytkach, wchodzenie do fontann.</li>
+     <li><b>Listopad:</b> ok. 10–18°C, możliwy deszcz. Zachód słońca ok. 16:50, więc zwiedzanie na zewnątrz kończcie przed zmrokiem.</li>
+   </ul></section>
+   <section class="sec"><h3>Kilka słów</h3><div class="card phr">
+     <span>Buongiorno / Buonasera</span><i>Dzień dobry / Dobry wieczór</i>
+     <span>Grazie (mille)</span><i>Dziękuję (bardzo)</i>
+     <span>Il conto, per favore</span><i>Rachunek, proszę</i>
+     <span>Un caffè / un cappuccino</span><i>Espresso / cappuccino</i>
+     <span>Quanto costa?</span><i>Ile kosztuje?</i>
+     <span>Scusi, dov'è…?</span><i>Przepraszam, gdzie jest…?</i>
+     <span>Acqua naturale / frizzante</span><i>Woda niegazowana / gazowana</i>
+   </div></section>
+   <p style="color:var(--muted);font-size:12px;margin-top:28px">Zdjęcia: Wikimedia Commons (licencje CC). Godziny i ceny sprawdźcie przed wyjściem, bo bywają zmieniane.</p>`;
+}
+
+function openPlace(id){
+  const p = PLACES[id]; if(!p) return;
+  const day = DAYS.find(d=>d.items.some(i=>i.p===id));
+  const it = day.items.find(i=>i.p===id);
+  const v = visited.has(id);
+  const s = $("#sheet");
+  s.innerHTML = `<div class="hero"><img src="img/${p.img}.jpg" alt="${p.name}"><button class="close" id="close" aria-label="Zamknij">←</button><span class="credit">fot. Wikimedia Commons</span></div>
+   <div class="sbody"><div class="eyebrow">${day.num} · ${day.name.toUpperCase()} · ${it.t} · ${p.dur}</div>
+   <h2>${p.name}</h2><p class="orig">${p.orig}</p><p class="lead">${p.lead}</p>
+   <div class="actions"><a class="btn solid" href="${maps(p.ll)}" target="_blank" rel="noopener">Nawiguj ↗</a>
+     <button class="btn" id="mark" aria-pressed="${v}">${v?"✓ Zaliczone":"Oznacz jako zaliczone"}</button></div>
+   <h4>HISTORIA</h4>${p.hist.map(x=>`<p>${x}</p>`).join("")}
+   <h4>CIEKAWOSTKI</h4><ul class="facts">${p.facts.map(x=>`<li>${x}</li>`).join("")}</ul>
+   <h4>PRAKTYCZNIE</h4><dl class="kv">${p.info.map(([k,x])=>`<dt>${k}</dt><dd>${x}</dd>`).join("")}</dl>
+   ${p.tip?`<div class="tip"><b>Wskazówka:</b> ${p.tip}</div>`:""}</div>`;
+  s.hidden = false; s.scrollTop = 0; document.body.style.overflow="hidden";
+  $("#close").onclick = ()=>{ location.hash = day.id };
+  $("#mark").onclick = ()=>{ visited.has(id)?visited.delete(id):visited.add(id); store.set("rzym-visited",[...visited]); openPlace(id); renderDay(day); };
+}
+function closeSheet(){ $("#sheet").hidden = true; document.body.style.overflow=""; }
+
+let lastTab = null;
+function route(){
+  const h = location.hash.slice(1);
+  if(h.startsWith("p-") && PLACES[h.slice(2)]){
+    const id=h.slice(2), day=DAYS.find(d=>d.items.some(i=>i.p===id));
+    if(lastTab!==day.id){renderTabs(day.id);renderDay(day);lastTab=day.id}
+    openPlace(id); return;
+  }
+  closeSheet();
+  const ti = todayIdx();
+  const tab = h==="info" ? "info" : (DAYS.find(d=>d.id===h)||DAYS[ti<0?0:ti]).id;
+  renderTabs(tab);
+  if(tab==="info") renderInfo(); else renderDay(DAYS.find(d=>d.id===tab));
+  if(lastTab!==tab) window.scrollTo(0,0);
+  lastTab = tab;
+}
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]"); if(g){location.hash=g.dataset.go;return}
+  const pl=e.target.closest("[data-place]"); if(pl){location.hash="p-"+pl.dataset.place}
+});
+document.addEventListener("change",e=>{
+  const id=e.target.dataset.todo; if(!id) return;
+  e.target.checked?todo.add(id):todo.delete(id); store.set("rzym-todo",[...todo]);
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && !$("#sheet").hidden) $("#close").click() });
+window.addEventListener("hashchange",route);
+route();
+if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js").catch(()=>{}) }catch(e){} }
+</script>
